@@ -60,15 +60,13 @@ st.markdown("""
 st.write(user_input)
 
 # MODEL PREDICTION
-
-if st.button("Predict"):
-    with st.spinner("Prediciting..."):
+if st.button("Click here to Predict"):
+    with st.spinner("Predicting..."):
         import time
         time.sleep(2)
         counter = 0
         model_ans = []
         model_prob = []
-        
         for model in all_models:
             ans = model.predict([user_input])[0]
             try:
@@ -78,56 +76,51 @@ if st.button("Predict"):
             model_prob.append(prob)
             class_ans = classes[ans]
             model_ans.append(class_ans)
-            st.write(f"Prediction by: {all_model_name[counter]}===>{class_ans}")
-            counter += 1    
-    
+            # st.write(f"Prediction by: {all_model_name[counter]}===>{class_ans}")
+            counter += 1
 
+        st.markdown("""
+        <h2> Model Comparison </h2>
+        """,unsafe_allow_html=True)
 
-    st.markdown("""
-    <h2> Final Prediction</h2>
-    """,unsafe_allow_html = True)
+        comp_df = pd.DataFrame({"x":all_model_name, 
+                                "y":model_prob,
+                               'Model-Prediction':class_ans})
+        
+        import altair as alt
+        chart = (alt.Chart(comp_df).mark_bar().encode(
+            x = 'x',
+            y = 'y',
+            tooltip = ['x','y','Model-Prediction']
+        ))
 
-    comp_df = pd.DataFrame({"x": all_model_name,
-                           "y": model_prob,
-                           "Model_Prediction": class_ans})
-    
-    import altair as plt
-    chart = (alt.Chart(comp_df).mark_bar().encode(
-
-        x = 'x',
-        y = 'y',
-        tooltip = ['x','y','Model_Predictiton']
-
-    ))
-
-    st.altair_chart(chart, use_container_width = True)
-
-
-    st.markdown("""
-    <h2> Final Prediction</h2>
-    """,unsafe_allow_html = True)
-
-    data = pd.Series(model_ans)
-    final_ans = data.mode().values[0]
-    st.success(final_ans)
+        st.altair_chart(chart, use_container_width = True)
+        
+        st.markdown("""
+        <h2> Final Prediction </h2>
+        """,unsafe_allow_html=True)
+        
+        data = pd.Series(model_ans)
+        final_ans = data.mode().values[0]
+        st.success(final_ans)
 
 footer = """
-footer {
-position: fixed;
-left: 0;
-bottom: 0;
-width: 100%;
-background-color: white;
-color: black;
-text-align: center;
+<style>
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: transparent;
+    color: #888888;
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
 }
 </style>
 <div class="footer">
-<p>Developed with ❤ by <a style='display: block; text-align: center;' href="https://www.heflin.dev/" target="_blank">Heflin Stephen Raj S</a></p>
+    <p>Made with ❤️ using Streamlit • © 2026</p>
 </div>
 """
-st.markdown(footer,unsafe_allow_html=True)
 
-
-    
-    
+st.markdown(footer, unsafe_allow_html=True)
